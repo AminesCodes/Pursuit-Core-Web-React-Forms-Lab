@@ -56,11 +56,11 @@ class App extends React.Component {
 
 
   handleInputChange = (event) => {
-    this.setState({ userInput: event.target.value })
+    this.setState({ userInput: event.target.value, formReady: false})
   }
 
   handleSelectChange = (event) => {
-    this.setState({ operation: event.target.value })
+    this.setState({ operation: event.target.value, formReady: false})
   }
 
   handleSubmitForm = (event) => {
@@ -70,7 +70,7 @@ class App extends React.Component {
       const arrangedArray = renderArray(inputArray);
 
       if (arrangedArray.length) {
-        this.setState({ formReady: true })
+        this.setState({ formReady: 'yes' })
 
         if (this.state.operation === 'sum') {
           this.setState({ result: sum(arrangedArray) })
@@ -84,30 +84,33 @@ class App extends React.Component {
           this.setState({ result: mode(arrangedArray) })
         }
       } else {
-        this.setState({ formReady: false })
+        this.setState({ formReady: 'no' })
       }
     } else {
-      this.setState({ formReady: false })
+      this.setState({ formReady: 'no' })
     }
   }
 
-  handleReset = () => {
+  handleReset = (event) => {
+    event.preventDefault();
     this.setState(this.initialState)
   }
 
   render() {
-    let {
+    const {
       userInput,
       operation,
       result,
       formReady
     } = this.state;
 
-    let resultToDisplay = <p>Input field is required and <strong>should</strong> contain only numbers, separated by coma</p>;
+    let resultToDisplay = null;
 
-    if (formReady) {
+    if (formReady === 'yes') {
       resultToDisplay = <p>Result: {result}</p>;
-
+    } 
+    if (formReady === 'no') {
+      resultToDisplay = <p>Input field is required and <strong>should</strong> contain only numbers, separated by coma</p>;
     }
 
     return (
@@ -123,19 +126,20 @@ class App extends React.Component {
             <option value='avg'>Average</option>
             <option value='mode'>Mode</option>
           </select>
-          <br></br>
 
-          <button>Submit</button>
+          <button onClick={this.handleReset}>Reset</button>
+
+          <h5>* Non numeric values will be ignored (filtered)</h5>
+
+          <button>Calculate</button>
 
         </form>
         <br></br>
         
-        <button onClick={this.handleReset}>Reset</button>
 
         <hr></hr>
         {resultToDisplay}
 
-        <h5>* Non numeric values will be ignored (filtered)</h5>
       </div>
     )
   }
